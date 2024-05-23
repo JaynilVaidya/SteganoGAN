@@ -5,6 +5,7 @@ from model.decoder import decoder_model
 from model.gan import gan_model
 from model.steganogan import steganogan_model
 import cv2 as cv2
+import gc
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -17,7 +18,7 @@ gan=gan_model(gen,disc)
 steganogan=steganogan_model(gen,decoder)
 
 
-X_train = np.load('C:/Users/Jaynil/Github repos/SteganoGan/data/processed/new_data2000.npz.npy')
+X_train = np.load('/data/processed/new_data2000.npz.npy')
 
 epochs=50
 batch_size=32
@@ -55,6 +56,7 @@ for e in range(epochs):
     gen.trainable=True
     y2=np.full(batch_size,0.9)
     loss2=gan.train_on_batch([realimgs,code],y2,return_dict=True)
+    gc.collect()
     
     print(f"Epoch {e}/{epochs}, Batch {mb}/{batches}:")
     print(f"  Discriminator Loss: {loss1['loss']:.4f}, GAN Loss: {loss2['loss']:.4f}")
@@ -73,4 +75,6 @@ for e in range(epochs):
 #       print('Steg Image\n')
 #       plt.imshow(cv2.cvtColor(stegimgg[0], cv2.COLOR_BGR2RGB ))
 #       plt.show()
-#       gc.collect()
+
+generator.save('data/processed/gen.h5')
+decoder.save('data/processed/decoder.h5')
